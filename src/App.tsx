@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import "./App.css";
 import { EmailFieldComponent } from "./components/EmailField";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 interface DataRow {
   id: number;
@@ -25,17 +25,21 @@ function App() {
     setEmail(event.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
     // Handle submit logic here, such as sending the email or showing the joke
-
     const newData = [...data, { id: data.length + 1, email }];
 
-    setData(newData);
+    // sort the data by domain
+    const sortedData = newData.sort((a, b) => {
+      const [, aDomain] = a.email.split("@");
+      const [, bDomain] = b.email.split("@");
+      return aDomain.localeCompare(bDomain);
+    });
 
+    setData(sortedData);
     setEmail("");
-
-    console.log(data, "Data emails array");
-  };
+    console.log(sortedData, "Sorted Data by domain");
+  }, [data, email]);
 
   return (
     <>
