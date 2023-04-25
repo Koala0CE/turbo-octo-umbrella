@@ -28,17 +28,21 @@ function App() {
   const handleSubmit = useCallback(() => {
     // Handle submit logic here, such as sending the email or showing the joke
     const newData = [...data, { id: data.length + 1, email }];
-
-    // sort the data by domain
+    // sort the data by first the domain
+    // then by left side text
     const sortedData = newData.sort((a, b) => {
-      const [, aDomain] = a.email.split("@");
-      const [, bDomain] = b.email.split("@");
-      return aDomain.localeCompare(bDomain);
+      const [aText, aDomain] = a.email.split("@");
+      const [bText, bDomain] = b.email.split("@");
+      const domainCompare = aDomain.localeCompare(bDomain);
+      if (domainCompare !== 0) {
+        return domainCompare;
+      }
+      return aText.localeCompare(bText);
     });
-
     setData(sortedData);
+    // console.log("Sorted Data by domain and name", sortedData);
+
     setEmail("");
-    console.log(sortedData, "Sorted Data by domain");
   }, [data, email]);
 
   return (
