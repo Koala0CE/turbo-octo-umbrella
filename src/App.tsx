@@ -1,33 +1,79 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import {
+  Box,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import "./App.css";
+import { EmailFieldComponent } from "./components/EmailField";
+import { useState } from "react";
+
+interface DataRow {
+  id: number;
+
+  email: string;
+}
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [email, setEmail] = useState("");
+  const [data, setData] = useState<DataRow[]>([]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(event.target.value);
+  };
+
+  const handleSubmit = () => {
+    // Handle submit logic here, such as sending the email or showing the joke
+
+    const newData = [...data, { id: data.length + 1, email }];
+
+    setData(newData);
+
+    setEmail("");
+
+    console.log(data, "Data emails array");
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="100vh"
+        minWidth={"100vh"}
+        bgcolor={"white"}
+        m={2}
+      >
+        <form onSubmit={handleSubmit}>
+          <EmailFieldComponent
+            label="Email Address"
+            value={email}
+            onChange={handleChange}
+          />
+          <Button variant="contained" color="primary" onClick={handleSubmit}>
+            Submit
+          </Button>
+        </form>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Email</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {data.map((row) => (
+              <TableRow key={row.id}>
+                <TableCell>{row.email}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
     </>
   );
 }
