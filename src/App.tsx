@@ -1,87 +1,113 @@
 import {
   Box,
-  Button,
+  Card,
+  CardContent,
+  CardMedia,
+  Divider,
+  Grid,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Typography,
 } from "@mui/material";
 import "./App.css";
-import { EmailFieldComponent } from "./components/EmailField";
-import { useCallback, useState } from "react";
 
-interface DataRow {
-  id: number;
+import { useState } from "react";
+import EmailForm from "./components/EmailForm";
 
-  email: string;
-}
+import spring from "./assets/spring.png";
+import spring1 from "./assets/spring1.png";
 
 function App() {
-  const [email, setEmail] = useState("");
-  const [data, setData] = useState<DataRow[]>([]);
+  const [emails, setEmails] = useState<string[]>([]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
+  const handleSubmit = async (validEmails: string[]) => {
+    console.log(emails, "emailsss");
+    setEmails(validEmails);
+    console.log(validEmails, "validf");
 
-  const handleSubmit = useCallback(() => {
-    // Handle submit logic here, such as sending the email or showing the joke
-    const newData = [...data, { id: data.length + 1, email }];
-    // sort the data by first the domain
-    // then by left side text
-    const sortedData = newData.sort((a, b) => {
-      const [aText, aDomain] = a.email.split("@");
-      const [bText, bDomain] = b.email.split("@");
-      const domainCompare = aDomain.localeCompare(bDomain);
-      if (domainCompare !== 0) {
-        return domainCompare;
-      }
-      return aText.localeCompare(bText);
+    // send a POST request to the API with the list of emails
+    const response = await fetch("http://localhost:8000/api/jokes", {
+      method: "POST",
+      headers: {
+        // "Content-Type": "application/json",
+      },
+      body: JSON.stringify(emails),
     });
-    setData(sortedData);
-    // console.log("Sorted Data by domain and name", sortedData);
 
-    setEmail("");
-  }, [data, email]);
+    console.log(response, "Response");
+
+    if (!response.ok) {
+      const error = await response.json();
+      console.error(`Error sending emails: ${error.message}`);
+      return;
+    }
+
+    const data = await response.json();
+    console.log(data.message);
+  };
 
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
+      <Grid
+        color={"red"}
+        container
+        direction="row"
         justifyContent="center"
-        alignItems="center"
-        minHeight="100vh"
-        minWidth={"100vh"}
-        bgcolor={"white"}
-        m={2}
+        alignItems="flex-start"
+        sx={{ display: "flex", height: "100%" }}
       >
-        <form onSubmit={handleSubmit}>
-          <EmailFieldComponent
-            label="Email Address"
-            value={email}
-            onChange={handleChange}
-          />
-          <Button variant="contained" color="primary" onClick={handleSubmit}>
-            Submit
-          </Button>
-        </form>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Email</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow key={row.id}>
-                <TableCell>{row.email}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Box>
+        <Card sx={{ maxWidth: 345, height: "100%" }}>
+          <CardMedia sx={{ height: 190 }} image={spring} title="spring" />
+          <CardContent>
+            <Typography variant="h5" color={"purple"}>
+              Emails
+            </Typography>
+            <EmailForm onSubmit={handleSubmit} />
+          </CardContent>
+        </Card>
+
+        {emails.length > 0 && (
+          <>
+            <Divider orientation="vertical" flexItem>
+              X
+            </Divider>
+            <Card sx={{ maxWidth: 345, height: "100%" }}>
+              <CardMedia sx={{ height: 190 }} image={spring1} title="spring" />
+
+              <CardContent>
+                <Typography
+                  gutterBottom
+                  variant="h5"
+                  component="div"
+                  color={"red"}
+                >
+                  Email Addresses
+                </Typography>
+
+                <Typography p={1} variant="body2" color="GrayText">
+                  You have successfully sent a random Chuck Norris Joke to the
+                  following emails:
+                </Typography>
+
+                <Table>
+                  <TableHead></TableHead>
+                  <TableBody>
+                    {emails.map((email, index) => (
+                      <TableRow key={index}>
+                        <TableCell>{email}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <Box height={79}></Box>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </Grid>
     </>
   );
 }
