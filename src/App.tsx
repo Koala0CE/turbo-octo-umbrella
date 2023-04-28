@@ -24,9 +24,7 @@ function App() {
   const [emails, setEmails] = useState<string[]>([]);
 
   const handleSubmit = async (validEmails: string[]) => {
-    console.log(emails, "emailsss");
     setEmails(validEmails);
-    console.log(validEmails, "validf");
 
     // send a POST request to the API with the list of emails
     const response = await fetch("http://localhost:8000/api/jokes", {
