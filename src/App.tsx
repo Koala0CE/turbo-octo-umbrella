@@ -13,6 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 import "./App.css";
+const API_URL = import.meta.env.VITE_API_URL;
+const endPoint = "/api/jokes";
 
 import { useState } from "react";
 import EmailForm from "./components/EmailForm";
@@ -27,7 +29,7 @@ function App() {
     setEmails(validEmails);
 
     // send a POST request to the API with the list of emails
-    const response = await fetch("http://localhost:8000/api/jokes", {
+    const response = await fetch(`${API_URL}${endPoint}`, {
       method: "POST",
       headers: {
         // "Content-Type": "application/json",
